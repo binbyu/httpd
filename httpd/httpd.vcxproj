@@ -77,7 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="event.c" />
-    <ClCompile Include="http.cpp" />
+    <ClCompile Include="http.c" />
     <ClCompile Include="logger.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="network.c" />

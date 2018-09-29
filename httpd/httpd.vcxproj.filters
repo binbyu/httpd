@@ -30,7 +30,7 @@
     <ClCompile Include="utils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="http.cpp">
+    <ClCompile Include="http.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
