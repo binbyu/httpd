@@ -5,7 +5,6 @@
 #define LF                  (u_char) '\n'
 #define CR                  (u_char) '\r'
 #define CRLF                "\r\n"
-#define BUFFER_UNIT         4096
 
 typedef struct  
 {
@@ -198,7 +197,7 @@ static void read_callback(event_t *ev)
                     release_request_header(&header);
                     return;
                 }
-
+				
                 // read boundary
                 free(header.uri);
                 free(buf);buf=NULL;
@@ -245,7 +244,7 @@ static void read_callback(event_t *ev)
                 memcpy(ev_data->file, file_name, strlen(file_name));
                 ev_data->total = content_length;
                 ev_data->offset = len;
-                ev_data->tail = boundary_length + strlen(CRLF)*2+strlen("--");
+                ev_data->tail = boundary_length + strlen(CRLF)*3+strlen("--");
                 ASSERT(content_length > len);
                 ev->status = evBusy;
                 ev->data = ev_data;

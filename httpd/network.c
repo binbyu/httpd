@@ -91,14 +91,14 @@ ret_code_t network_accept(SOCKET sfd, struct in_addr* addr, SOCKET *cfd)
     return SUCC;
 }
 
-ret_code_t network_read(SOCKET fd, void *buf, int32_t size)
+ret_code_t network_read(SOCKET fd, char *buf, int32_t size)
 {
     int ret = 0;
     int offset = 0;
 
     while (TRUE)
     {
-        ret = recv(fd, buf, size-offset, 0);
+        ret = recv(fd, buf+offset, size-offset, 0);
         if (ret == SOCKET_ERROR)
         {
             log_error("{%s:%d} recv fail. socket=%d WSAGetLastError=%d", __FUNCTION__, __LINE__, fd, WSAGetLastError());

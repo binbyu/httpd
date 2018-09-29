@@ -6,7 +6,7 @@ static const char* log_file_name();
 
 void log_debug(const char *fmt, ...)
 {
-    char buffer[1024] = { 0 };
+    char buffer[BUFFER_UNIT] = { 0 };
     va_list args;
 
     if (LOG_DEBU < LOG_LEVEL)
@@ -21,7 +21,7 @@ void log_debug(const char *fmt, ...)
 
 void log_info(const char *fmt, ...)
 {
-    char buffer[1024] = { 0 };
+    char buffer[BUFFER_UNIT] = { 0 };
     va_list args;
 
     if (LOG_INFO < LOG_LEVEL)
@@ -36,7 +36,7 @@ void log_info(const char *fmt, ...)
 
 void log_warn(const char *fmt, ...)
 {
-    char buffer[1024] = { 0 };
+    char buffer[BUFFER_UNIT] = { 0 };
     va_list args;
 
     if (LOG_WARN < LOG_LEVEL)
@@ -52,7 +52,7 @@ void log_warn(const char *fmt, ...)
 
 void log_error(const char *fmt, ...)
 {
-    char buffer[1024] = { 0 };
+    char buffer[BUFFER_UNIT] = { 0 };
     va_list args;
 
     if (LOG_ERRO < LOG_LEVEL)

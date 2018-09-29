@@ -10,6 +10,8 @@
 #define FD_SETSIZE  1024
 #endif
 
+#define BUFFER_UNIT 4096
+
 #ifdef _DEBUG
 #define ASSERT(x)   assert(x)
 #else
