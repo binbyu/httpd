@@ -10,7 +10,7 @@ typedef enum
     LOG_ERRO
 } log_level_t;
 
-#define LOG_LEVEL   LOG_DEBU
+#define LOG_LEVEL   LOG_INFO
 #define SAVE_FILE   1
 
 void log_debug(const char *fmt, ...);

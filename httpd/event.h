@@ -1,6 +1,7 @@
 #ifndef __EVENT_H__
 #define __EVENT_H__
 
+#define BOUNDARY_MAX_LEN    64
 typedef enum
 {
     EV_UNKNOWN              = 0x00,
@@ -12,17 +13,17 @@ typedef enum
 
 typedef enum  
 {
-    evIdle                  = 0,
-    evBusy,
-    evFinish
+    EV_IDLE                  = 0,
+    EV_BUSY,
+    EV_FINISH
 } event_status_t;
 
 typedef struct
 {
     char                    file[MAX_PATH];
+    char                    boundary[BOUNDARY_MAX_LEN];
     uint32_t                total;
     uint32_t                offset;
-    uint32_t                tail;
     uint32_t                size;
     FILE                   *fp;         // fixed fopen EACCES error. just for write file
     char                    data[1];
