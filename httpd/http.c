@@ -141,7 +141,7 @@ static void read_callback(event_t *ev)
             // 4. get Content-Type
             // 5. Content-Type is json or others
         }
-        if (0 == strncmp(header.uri, "/upload", strlen("/upload")))
+        if (0 == strncmp(header.uri, "/upload", strlen("/upload")) && 0 == strcmp(header.method, "POST"))
         {
             // get upload file save path from uri
             memset(file_path, 0, sizeof(file_path));
@@ -205,7 +205,7 @@ static void read_callback(event_t *ev)
                     return;
                 }
 
-                // relase memory
+                // release memory
                 release_request_header(&header);
                 free(buf);
 
@@ -386,6 +386,7 @@ static void read_request_boundary(event_t *ev)
 
     offset = ev->data->total - ev->data->offset > BUFFER_UNIT ? BUFFER_UNIT : ev->data->total - ev->data->offset;
     ret = network_read(ev->fd, buffer, offset);
+    
     if (ret == DISC)
     {
         response_http_500_page(ev);
@@ -440,17 +441,7 @@ static void read_request_boundary(event_t *ev)
         case 4: // backup last boundary
         case 5: // backup middle boundary
             writen = ptr - compare_buff;
-            if (writen)
-            {
-                if (writen != fwrite(compare_buff, 1, writen, ev->data->fp))
-                {
-                    log_error("{%s:%d} write file fail. socket=%d", __FUNCTION__, __LINE__, ev->fd);
-                    release_event_data(ev);
-                    ev->status = EV_IDLE;
-                    response_upload_page(ev, 0);
-                    return;
-                }
-            }
+            WRITE_FILE(ev->data->fp, compare_buff, writen, ev);
             // backup
             ev->data->size = compare_buff + compare_buff_size - ptr;
             memcpy(ev->data->data, ptr, ev->data->size);
@@ -751,7 +742,7 @@ static int parse_boundary(event_t *ev, char *data, int size, char **ptr)
     int i;
 
     sprintf(first_boundary, "--%s\r\n", ev->data->boundary);      //------WebKitFormBoundaryOG3Viw9MEZcexbvT\r\n
-    sprintf(middle_boundary, "\r\n--%s\r\n", ev->data->boundary);   //\r\n----WebKitFormBoundaryOG3Viw9MEZcexbvT\r\n
+    sprintf(middle_boundary, "\r\n--%s\r\n", ev->data->boundary);   //\r\n------WebKitFormBoundaryOG3Viw9MEZcexbvT\r\n
     sprintf(last_boundary, "\r\n--%s--\r\n", ev->data->boundary); //\r\n------WebKitFormBoundaryOG3Viw9MEZcexbvT--\r\n
     first_len  = strlen(first_boundary);
     middle_len = strlen(middle_boundary);
@@ -766,12 +757,6 @@ static int parse_boundary(event_t *ev, char *data, int size, char **ptr)
         return 1; // first boundary
     }
 
-    if (0 == memcmp(data + (size - last_len), last_boundary, last_len))
-    {
-        *ptr = data + (size - last_len);
-        return 2; // last boundary
-    }
-
     for (i = 0; i < size; i++)
     {
         if (size - i >= last_len)
@@ -780,6 +765,12 @@ static int parse_boundary(event_t *ev, char *data, int size, char **ptr)
             {
                 *ptr = data + i/* + middle_len*/;
                 return 3; // middle boundary
+            }
+
+            if (0 == memcmp(data + i, last_boundary, last_len))
+            {
+                *ptr = data + (size - last_len);
+                return 2; // last boundary
             }
         }
         else if (size - i >= middle_len && size - i < last_len)
@@ -797,15 +788,15 @@ static int parse_boundary(event_t *ev, char *data, int size, char **ptr)
         }
         else if (size - i >= 7 && size - i < middle_len)
         {
-            if (0 == memcmp(data + i, last_boundary, size - i))
-            {
-                *ptr = data + i;
-                return 4; // backup last boundary
-            }
             if (0 == memcmp(data + i, middle_boundary, size - i))
             {
                 *ptr = data + i;
                 return 5; // backup middle boundary
+            }
+            if (0 == memcmp(data + i, last_boundary, size - i))
+            {
+                *ptr = data + i;
+                return 4; // backup last boundary
             }
         }
         else
